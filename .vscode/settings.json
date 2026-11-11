@@ -1,0 +1,8 @@
+{
+    "cmake.sourceDirectory": "/home/xiaokai/gemini335-learning/c++",
+    "python.analysis.extraPaths": [
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages",
+        "/home/xiaokai/orbbec_ws/install/orbbec_camera/lib/python3.10/site-packages"
+    ]
+}

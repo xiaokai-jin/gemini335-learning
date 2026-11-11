@@ -1,0 +1,27 @@
+[11/11 13:04:27.113286][info][91195][LinuxUsbPal.cpp:335] Create PollingDeviceWatcher!
+[11/11 13:04:27.113362][info][91195][DeviceManager.cpp:25] Current found device(s): (1)
+[11/11 13:04:27.113367][info][91195][DeviceManager.cpp:34] 	- Name: Gemini 335, PID: 0x0800, SN/ID: CP0F463000XE, Connection: USB3.2
+[11/11 13:04:27.113371][info][91195][DeviceManager.cpp:339] Enable net device enumeration: true
+[11/11 13:04:29.137073][info][91195][DeviceManager.cpp:25] Current device(s) list: (1)
+[11/11 13:04:29.137109][info][91195][DeviceManager.cpp:34] 	- Name: Gemini 335, PID: 0x0800, SN/ID: CP0F463000XE, Connection: USB3.2
+[11/11 13:04:29.175835][info][91195][DeviceBase.cpp:651] key: AppSlot,value:2
+[11/11 13:04:29.175857][info][91195][DeviceBase.cpp:651] key: HwType,value:R1
+[11/11 13:04:29.175861][info][91195][DeviceBase.cpp:651] key: HwVer,value:V1.1
+[11/11 13:04:29.175864][info][91195][DeviceBase.cpp:651] key: IspFwVer,value:20260620
+[11/11 13:04:29.175866][info][91195][DeviceBase.cpp:651] key: IspNeedVer,value:20250930
+[11/11 13:04:29.175872][info][91195][DeviceBase.cpp:651] key: PresetVer,value:3.0.7
+[11/11 13:04:29.334821][info][91195][DeviceManager.cpp:194] Device created successfully! Name: Gemini 335, PID: 0x0800, SN/ID: CP0F463000XE FW: 1.8.10
+[11/11 13:04:29.334860][info][91195][Pipeline.cpp:42] [CP0F463000XE] Pipeline created with device: {name: Gemini 335, sn: CP0F463000XE}, @0x5CA210CD37A0
+[11/11 13:04:29.399161][info][91195][Pipeline.cpp:216] [CP0F463000XE] Check and set config done!
+[11/11 13:04:29.399180][info][91195][Pipeline.cpp:254] [CP0F463000XE] Try to start streams!
+[11/11 13:04:29.399185][info][91195][VideoSensor.cpp:58] [CP0F463000XE] Try to start stream: {type: Color, format: MJPG, width: 1280, height: 720, fps: 30}
+[11/11 13:04:29.399191][info][91195][SensorBase.cpp:213] [CP0F463000XE] Stream state changed to STARTING@Color
+[11/11 13:04:29.399194][info][91195][VideoSensor.cpp:127] [CP0F463000XE] Start backend stream: {type: Color, format: MJPG, width: 1280, height: 720, fps: 30}
+[11/11 13:04:29.400623][info][91195][VideoSensor.cpp:58] [CP0F463000XE] Try to start stream: {type: Depth, format: Y16, width: 848, height: 480, fps: 30}
+[11/11 13:04:29.400637][info][91195][SensorBase.cpp:213] [CP0F463000XE] Stream state changed to STARTING@Depth
+[11/11 13:04:29.400640][info][91195][VideoSensor.cpp:127] [CP0F463000XE] Start backend stream: {type: Depth, format: Z16, width: 848, height: 480, fps: 30}
+[11/11 13:04:29.401816][info][91195][Pipeline.cpp:270] [CP0F463000XE] Start streams done!
+[11/11 13:04:29.401820][info][91195][Pipeline.cpp:238] [CP0F463000XE] Pipeline start done!
+[11/11 13:04:29.485440][info][91419][SensorBase.cpp:213] [CP0F463000XE] Stream state changed to STREAMING@Depth
+[11/11 13:04:29.962377][info][91418][SensorBase.cpp:213] [CP0F463000XE] Stream state changed to STREAMING@Color
+[11/11 13:04:30.329387][warning][91443][Pipeline.cpp:295] [CP0F463000XE] Output frameset queue is full, drop oldest frameset!

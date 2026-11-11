@@ -1,0 +1,54 @@
+[11/11 13:12:13.872718][info][110444][LinuxUsbPal.cpp:335] Create PollingDeviceWatcher!
+[11/11 13:12:13.872794][info][110444][DeviceManager.cpp:25] Current found device(s): (1)
+[11/11 13:12:13.872803][info][110444][DeviceManager.cpp:34] 	- Name: Gemini 335, PID: 0x0800, SN/ID: CP0F463000XE, Connection: USB3.2
+[11/11 13:12:13.872806][info][110444][DeviceManager.cpp:339] Enable net device enumeration: true
+[11/11 13:12:15.879829][info][110444][DeviceManager.cpp:25] Current device(s) list: (1)
+[11/11 13:12:15.879853][info][110444][DeviceManager.cpp:34] 	- Name: Gemini 335, PID: 0x0800, SN/ID: CP0F463000XE, Connection: USB3.2
+[11/11 13:12:15.884032][info][110444][DeviceBase.cpp:651] key: AppSlot,value:2
+[11/11 13:12:15.884049][info][110444][DeviceBase.cpp:651] key: HwType,value:R1
+[11/11 13:12:15.884050][info][110444][DeviceBase.cpp:651] key: HwVer,value:V1.1
+[11/11 13:12:15.884051][info][110444][DeviceBase.cpp:651] key: IspFwVer,value:20260620
+[11/11 13:12:15.884053][info][110444][DeviceBase.cpp:651] key: IspNeedVer,value:20250930
+[11/11 13:12:15.884054][info][110444][DeviceBase.cpp:651] key: PresetVer,value:3.0.7
+[11/11 13:12:16.042110][info][110444][DeviceManager.cpp:194] Device created successfully! Name: Gemini 335, PID: 0x0800, SN/ID: CP0F463000XE FW: 1.8.10
+[11/11 13:12:16.042155][info][110444][Pipeline.cpp:42] [CP0F463000XE] Pipeline created with device: {name: Gemini 335, sn: CP0F463000XE}, @0x6418667BC730
+[11/11 13:12:16.105269][info][110444][Pipeline.cpp:216] [CP0F463000XE] Check and set config done!
+[11/11 13:12:16.105292][info][110444][Pipeline.cpp:254] [CP0F463000XE] Try to start streams!
+[11/11 13:12:16.105296][info][110444][VideoSensor.cpp:58] [CP0F463000XE] Try to start stream: {type: Color, format: MJPG, width: 1280, height: 720, fps: 30}
+[11/11 13:12:16.105303][info][110444][SensorBase.cpp:213] [CP0F463000XE] Stream state changed to STARTING@Color
+[11/11 13:12:16.105305][info][110444][VideoSensor.cpp:127] [CP0F463000XE] Start backend stream: {type: Color, format: MJPG, width: 1280, height: 720, fps: 30}
+[11/11 13:12:16.106419][info][110444][VideoSensor.cpp:58] [CP0F463000XE] Try to start stream: {type: Depth, format: Y16, width: 848, height: 480, fps: 30}
+[11/11 13:12:16.106430][info][110444][SensorBase.cpp:213] [CP0F463000XE] Stream state changed to STARTING@Depth
+[11/11 13:12:16.106433][info][110444][VideoSensor.cpp:127] [CP0F463000XE] Start backend stream: {type: Depth, format: Z16, width: 848, height: 480, fps: 30}
+[11/11 13:12:16.107633][info][110444][Pipeline.cpp:270] [CP0F463000XE] Start streams done!
+[11/11 13:12:16.107638][info][110444][Pipeline.cpp:238] [CP0F463000XE] Pipeline start done!
+[11/11 13:12:16.190907][info][110537][SensorBase.cpp:213] [CP0F463000XE] Stream state changed to STREAMING@Depth
+[11/11 13:12:16.660828][info][110536][SensorBase.cpp:213] [CP0F463000XE] Stream state changed to STREAMING@Color
+[11/11 13:12:21.195513][info][110537][VideoSensor.cpp:153] [CP0F463000XE] Depth backend frame callback, frameRate=30.169830fps
+[11/11 13:12:21.198568][info][110539][SensorBase.cpp:370] [CP0F463000XE] Depth Streaming... frameRate=30.181892fps
+[11/11 13:12:21.673935][info][110536][VideoSensor.cpp:153] [CP0F463000XE] Color backend frame callback, frameRate=30.121683fps
+[11/11 13:12:21.674076][info][110574][SensorBase.cpp:370] [CP0F463000XE] Color Streaming... frameRate=30.121683fps
+[11/11 13:12:26.201386][info][110537][VideoSensor.cpp:153] [CP0F463000XE] Depth backend frame callback, frameRate=29.964043fps
+[11/11 13:12:26.204408][info][110539][SensorBase.cpp:370] [CP0F463000XE] Depth Streaming... frameRate=29.964043fps
+[11/11 13:12:26.680071][info][110536][VideoSensor.cpp:153] [CP0F463000XE] Color backend frame callback, frameRate=29.958059fps
+[11/11 13:12:26.680274][info][110574][SensorBase.cpp:370] [CP0F463000XE] Color Streaming... frameRate=29.964043fps
+[11/11 13:12:31.207202][info][110537][VideoSensor.cpp:153] [CP0F463000XE] Depth backend frame callback, frameRate=29.964043fps
+[11/11 13:12:31.210276][info][110539][SensorBase.cpp:370] [CP0F463000XE] Depth Streaming... frameRate=29.964043fps
+[11/11 13:12:31.685487][info][110536][VideoSensor.cpp:153] [CP0F463000XE] Color backend frame callback, frameRate=29.970030fps
+[11/11 13:12:31.685673][info][110574][SensorBase.cpp:370] [CP0F463000XE] Color Streaming... frameRate=29.970030fps
+[11/11 13:12:36.213290][info][110537][VideoSensor.cpp:153] [CP0F463000XE] Depth backend frame callback, frameRate=29.964043fps
+[11/11 13:12:36.215135][info][110539][SensorBase.cpp:370] [CP0F463000XE] Depth Streaming... frameRate=29.970030fps
+[11/11 13:12:36.691573][info][110536][VideoSensor.cpp:153] [CP0F463000XE] Color backend frame callback, frameRate=29.764282fps
+[11/11 13:12:36.691702][info][110574][SensorBase.cpp:370] [CP0F463000XE] Color Streaming... frameRate=29.764282fps
+[11/11 13:12:41.218970][info][110537][VideoSensor.cpp:153] [CP0F463000XE] Depth backend frame callback, frameRate=29.970030fps
+[11/11 13:12:41.222148][info][110539][SensorBase.cpp:370] [CP0F463000XE] Depth Streaming... frameRate=29.958059fps
+[11/11 13:12:41.697261][info][110536][VideoSensor.cpp:153] [CP0F463000XE] Color backend frame callback, frameRate=29.964043fps
+[11/11 13:12:41.697374][info][110574][SensorBase.cpp:370] [CP0F463000XE] Color Streaming... frameRate=29.964043fps
+[11/11 13:12:46.224848][info][110537][VideoSensor.cpp:153] [CP0F463000XE] Depth backend frame callback, frameRate=29.964043fps
+[11/11 13:12:46.227858][info][110539][SensorBase.cpp:370] [CP0F463000XE] Depth Streaming... frameRate=29.970030fps
+[11/11 13:12:46.703098][info][110536][VideoSensor.cpp:153] [CP0F463000XE] Color backend frame callback, frameRate=29.964043fps
+[11/11 13:12:46.703250][info][110574][SensorBase.cpp:370] [CP0F463000XE] Color Streaming... frameRate=29.964043fps
+[11/11 13:12:51.230869][info][110537][VideoSensor.cpp:153] [CP0F463000XE] Depth backend frame callback, frameRate=29.964043fps
+[11/11 13:12:51.233846][info][110539][SensorBase.cpp:370] [CP0F463000XE] Depth Streaming... frameRate=29.964043fps
+[11/11 13:12:51.709019][info][110536][VideoSensor.cpp:153] [CP0F463000XE] Color backend frame callback, frameRate=29.964043fps
+[11/11 13:12:51.709156][info][110574][SensorBase.cpp:370] [CP0F463000XE] Color Streaming... frameRate=29.964043fps
