@@ -37,7 +37,7 @@ orbbec_camera/orbbec_camera_node
 - 相机命名空间：默认 `gemini335`
 - 彩色流：启用，`1280 x 720 @ 30 FPS`
 - 深度流：默认启用
-- 点云：关闭
+- 点云：默认启用
 - 加速度计：关闭
 - 陀螺仪：关闭
 - 帧同步：开启
@@ -121,6 +121,28 @@ ros2 launch gemini335_bringup gemini335.launch.py \
   enable_color:=false
 ```
 
+调整 RGB 分辨率和帧率：
+
+```bash
+ros2 launch gemini335_bringup gemini335.launch.py \
+  color_width:=1280 color_height:=720 color_fps:=30
+```
+
+调整深度分辨率和帧率：
+
+```bash
+ros2 launch gemini335_bringup gemini335.launch.py \
+  depth_width:=1280 depth_height:=800 depth_fps:=30
+```
+
+分辨率和帧率必须使用 Gemini 335 支持的组合。修改后需要先停止当前相机节点，再重新启动；如果使用安装工作空间中的 launch 文件，还需要重新构建并 source：
+
+```bash
+cd /home/xiaokai/gemini335-learning
+colcon build --base-paths ros2 --build-base ros2/build --install-base ros2/install
+source ros2/install/setup.bash
+```
+
 ## 6. 查看 ROS2 话题
 
 查看节点和话题：
@@ -134,6 +156,19 @@ ros2 topic list
 
 ```text
 /gemini335/color/image_raw
+```
+
+点云话题通常位于：
+
+```text
+/gemini335/depth/points
+```
+
+查看点云话题类型和发布者：
+
+```bash
+ros2 topic info /gemini335/depth/points
+ros2 topic hz /gemini335/depth/points
 ```
 
 查看 RGB 图像：
