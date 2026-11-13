@@ -36,8 +36,15 @@ orbbec_camera/orbbec_camera_node
 
 - 相机命名空间：默认 `gemini335`
 - 彩色流：启用，`1280 x 720 @ 30 FPS`
-- 深度流：默认启用
+- 深度流：默认启用，`1280 x 800 @ 30 FPS`
+- 左目 IR 流：默认启用，`1280 x 800 @ 30 FPS`
+- 右目 IR 流：默认启用，`1280 x 800 @ 30 FPS`
 - 点云：默认启用
+- 彩色点云：默认关闭
+- 点云降采样：`1`（不降采样）
+- 点云 QoS：`default`
+- 有序点云：默认关闭
+- 深度对齐：默认使用软件对齐（`align_mode:=SW`）
 - 加速度计：关闭
 - 陀螺仪：关闭
 - 帧同步：开启
@@ -128,11 +135,13 @@ ros2 launch gemini335_bringup gemini335.launch.py \
   color_width:=1280 color_height:=720 color_fps:=30
 ```
 
-调整深度分辨率和帧率：
+调整深度分辨率和帧率（左右目开启时，必须与左右目使用相同的配置）：
 
 ```bash
 ros2 launch gemini335_bringup gemini335.launch.py \
-  depth_width:=1280 depth_height:=800 depth_fps:=30
+  depth_width:=1280 depth_height:=800 depth_fps:=30 \
+  left_ir_width:=1280 left_ir_height:=800 left_ir_fps:=30 \
+  right_ir_width:=1280 right_ir_height:=800 right_ir_fps:=30
 ```
 
 分辨率和帧率必须使用 Gemini 335 支持的组合。修改后需要先停止当前相机节点，再重新启动；如果使用安装工作空间中的 launch 文件，还需要重新构建并 source：
@@ -141,6 +150,14 @@ ros2 launch gemini335_bringup gemini335.launch.py \
 cd /home/xiaokai/gemini335-learning
 colcon build --base-paths ros2 --build-base ros2/build --install-base ros2/install
 source ros2/install/setup.bash
+```
+
+如果只需要原来的 `1280 x 800` 深度配置，必须同时关闭左右目：
+
+```bash
+ros2 launch gemini335_bringup gemini335.launch.py \
+  enable_left_ir:=false enable_right_ir:=false \
+  depth_width:=1280 depth_height:=800 depth_fps:=30
 ```
 
 ## 6. 查看 ROS2 话题
@@ -158,6 +175,16 @@ ros2 topic list
 /gemini335/color/image_raw
 ```
 
+左右目 IR 图像位于：
+
+```text
+/gemini335/left_ir/image_raw
+/gemini335/right_ir/image_raw
+```
+
+左右目图像的完整实验步骤和双目深度原理见
+[阶段四：双目图像](../docs/04-双目图像.md)。
+
 点云话题通常位于：
 
 ```text
@@ -169,6 +196,39 @@ ros2 topic list
 ```bash
 ros2 topic info /gemini335/depth/points
 ros2 topic hz /gemini335/depth/points
+```
+
+点云相关 launch 参数：
+
+```text
+enable_point_cloud
+enable_colored_point_cloud
+point_cloud_decimation_filter_factor（1~8）
+point_cloud_qos
+cloud_frame_id
+ordered_pc
+depth_registration
+align_mode（`SW` 或 `HW`）
+```
+
+例如，开启彩色点云并将点云降采样为 2：
+
+```bash
+ros2 launch gemini335_bringup gemini335.launch.py \
+  enable_colored_point_cloud:=true \
+  depth_registration:=true \
+  align_mode:=SW \
+  point_cloud_decimation_filter_factor:=2
+```
+
+Gemini 335 当前彩色点云建议使用软件对齐。`HW` 硬件对齐只适用于设备支持的彩色/深度 profile 组合；如果日志出现
+`Current stream profile is not support hardware d2c process`，应改为
+`align_mode:=SW`。
+
+彩色点云话题为：
+
+```text
+/gemini335/depth_registered/points
 ```
 
 查看 RGB 图像：
