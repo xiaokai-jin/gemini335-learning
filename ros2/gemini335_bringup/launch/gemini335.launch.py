@@ -41,6 +41,7 @@ def generate_launch_description():
             DeclareLaunchArgument("ordered_pc", default_value="false"),
             DeclareLaunchArgument("depth_registration", default_value="true"),
             DeclareLaunchArgument("align_mode", default_value="SW"),
+            DeclareLaunchArgument("enable_publish_extrinsic", default_value="true"),
 
             # Optional motion sensors.
             DeclareLaunchArgument("enable_accel", default_value="false"),
@@ -96,6 +97,9 @@ def generate_launch_description():
                         "point_cloud_qos": LaunchConfiguration("point_cloud_qos"),
                         "cloud_frame_id": LaunchConfiguration("cloud_frame_id"),
                         "ordered_pc": LaunchConfiguration("ordered_pc"),
+                        "enable_publish_extrinsic": LaunchConfiguration(
+                            "enable_publish_extrinsic"
+                        ),
 
                         # Motion sensors and synchronized capture.
                         "enable_accel": LaunchConfiguration("enable_accel"),
