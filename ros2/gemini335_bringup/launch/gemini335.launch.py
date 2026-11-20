@@ -1,5 +1,6 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
+from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
@@ -46,6 +47,24 @@ def generate_launch_description():
             # Optional motion sensors.
             DeclareLaunchArgument("enable_accel", default_value="false"),
             DeclareLaunchArgument("enable_gyro", default_value="false"),
+            DeclareLaunchArgument("enable_green_jar_detection", default_value="false"),
+            DeclareLaunchArgument("green_jar_minimum_area", default_value="500"),
+            DeclareLaunchArgument("green_jar_lower_h", default_value="35"),
+            DeclareLaunchArgument("green_jar_lower_s", default_value="40"),
+            DeclareLaunchArgument("green_jar_lower_v", default_value="20"),
+            DeclareLaunchArgument("green_jar_upper_h", default_value="85"),
+            DeclareLaunchArgument("green_jar_upper_s", default_value="255"),
+            DeclareLaunchArgument("green_jar_upper_v", default_value="255"),
+            DeclareLaunchArgument("green_jar_gamma", default_value="70"),
+            DeclareLaunchArgument("green_jar_clahe_clip", default_value="20"),
+            DeclareLaunchArgument(
+                "green_jar_results_dir",
+                default_value="/home/xiaokai/gemini335-learning/results/images",
+            ),
+            DeclareLaunchArgument(
+                "green_jar_image_topic",
+                default_value="/gemini335/color/image_raw",
+            ),
             Node(
                 package="orbbec_camera",
                 executable="orbbec_camera_node",
@@ -105,6 +124,31 @@ def generate_launch_description():
                         "enable_accel": LaunchConfiguration("enable_accel"),
                         "enable_gyro": LaunchConfiguration("enable_gyro"),
                         "enable_frame_sync": True,
+                    }
+                ],
+            ),
+            Node(
+                package="gemini335_bringup",
+                executable="object_detection_color.py",
+                name="green_jar_detector",
+                output="screen",
+                condition=IfCondition(
+                    LaunchConfiguration("enable_green_jar_detection")
+                ),
+                parameters=[
+                    {
+                        "image_topic": LaunchConfiguration("green_jar_image_topic"),
+                        "minimum_area": LaunchConfiguration("green_jar_minimum_area"),
+                        "lower_h": LaunchConfiguration("green_jar_lower_h"),
+                        "lower_s": LaunchConfiguration("green_jar_lower_s"),
+                        "lower_v": LaunchConfiguration("green_jar_lower_v"),
+                        "upper_h": LaunchConfiguration("green_jar_upper_h"),
+                        "upper_s": LaunchConfiguration("green_jar_upper_s"),
+                        "upper_v": LaunchConfiguration("green_jar_upper_v"),
+                        "low_light_gamma": LaunchConfiguration("green_jar_gamma"),
+                        "clahe_clip": LaunchConfiguration("green_jar_clahe_clip"),
+                        "results_dir": LaunchConfiguration("green_jar_results_dir"),
+                        "show_windows": True,
                     }
                 ],
             ),

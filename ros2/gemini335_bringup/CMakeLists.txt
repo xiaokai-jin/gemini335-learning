@@ -8,4 +8,9 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
+install(
+  PROGRAMS ../../python/object_detection_color.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()

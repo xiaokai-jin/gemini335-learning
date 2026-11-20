@@ -253,5 +253,68 @@ ros2 topic hz /gemini335/color/image_raw
 - ROS2 Humble 的 `launch`
 - ROS2 Humble 的 `launch_ros`
 - 已安装的 `orbbec_camera`
+- `rclpy`、`sensor_msgs` 和 `std_msgs`
+- `cv_bridge`
 
 Orbbec 的 deb 依赖、SDK 动态库和 udev 规则仍由 `/home/xiaokai/orbbec_ws` 及系统负责。项目目录只管理自己的启动文件，便于后续增加图像处理、深度处理和其他实验节点。
+
+## 8. 绿色罐子颜色分割
+
+在源码工作区重新构建并加载环境：
+
+```bash
+source /opt/ros/humble/setup.bash
+source /home/xiaokai/orbbec_ws/install/setup.bash
+cd /home/xiaokai/gemini335-learning
+colcon build \
+  --base-paths ros2 \
+  --build-base ros2/build \
+  --install-base ros2/install \
+  --packages-select gemini335_bringup
+source ros2/install/setup.bash
+```
+
+启动相机和绿色罐子检测：
+
+```bash
+ros2 launch gemini335_bringup gemini335.launch.py \
+  enable_green_jar_detection:=true \
+  green_jar_minimum_area:=500
+```
+
+已增加暗光增强：检测前会用 Gamma 和 CLAHE 提亮 HSV 的亮度分量。默认暗光参数为：
+
+```text
+H: 35~85
+S: 40~255
+V: 20~255
+Gamma x100: 70
+CLAHE clip x10: 20
+```
+
+界面中可拖动滑条实时调整：
+
+- `H min/max`：调整目标的色相范围。绿色通常在 35~85；相机偏绿或偏黄时移动整个范围。
+- `S min/max`：调整饱和度。暗处绿色容易变灰，降低 `S min` 可帮助识别，但可能增加背景误检。
+- `V min/max`：调整亮度。暗处罐子仍亮度较低时降低 `V min`；环境反光过强时提高 `V min` 或降低 `V max`。
+- `Gamma x100`：数值除以 100 得到 Gamma 倍数。默认 70 表示约 0.7，会增强暗部。若画面过亮或噪点增多，调到 100 或更高。
+- `CLAHE clip x10`：数值除以 10 得到局部对比度。默认 2.0；设为 0 可关闭 CLAHE。
+
+检测窗口只显示原图和绿色罐子的外接框，不再显示 HSV Mask 窗口。在检测窗口按：
+
+- `s` 保存成功案例图；
+- `f` 保存失败案例图；
+- `q` 退出。
+
+案例保存在 `results/images/`。节点发布：
+
+```text
+/gemini335/detection/image
+/gemini335/detection/green_jar
+```
+
+其中检测话题为包含外接框、中心像素、面积和时间戳的 JSON 字符串。也可直接运行脚本而不启动相机：
+
+```bash
+python3 python/object_detection_color.py
+```
