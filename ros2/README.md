@@ -318,3 +318,75 @@ CLAHE clip x10: 20
 ```bash
 python3 python/object_detection_color.py
 ```
+
+## 9. ArUco 标记检测
+
+当前 ArUco 实现只负责标记检测，不估计相机位姿。生成标记时使用：
+
+```text
+字典：DICT_4X4_50
+标记编号：0~49
+当前打印标记外框：48.5 mm
+```
+
+启动相机和 ArUco 检测：
+
+```bash
+source /opt/ros/humble/setup.bash
+source /home/xiaokai/orbbec_ws/install/setup.bash
+source ros2/install/setup.bash
+
+ros2 launch gemini335_bringup gemini335.launch.py \
+  enable_aruco_detection:=true \
+  aruco_dictionary:=DICT_4X4_50
+```
+
+节点会在彩色图像上绘制标记边框、编号和中心点，并发布：
+
+```text
+/gemini335/detection/aruco/image
+/gemini335/detection/aruco
+```
+
+检测话题中的每个标记包含：
+
+```text
+id：标记编号
+corners：四个角点像素坐标
+center：四角的中心像素坐标
+```
+
+角点顺序为左上、右上、右下、左下。检测窗口按 `s` 保存成功案例，
+按 `f` 保存失败案例，按 `q` 退出。
+
+查看检测结果：
+
+```bash
+ros2 topic echo /gemini335/detection/aruco
+```
+
+## 10. ArUco 节点退出原因说明
+
+一次启动日志中的 `exit code 1` 只表示检测进程在启动约 9 秒后退出，
+但该日志没有保留对应进程的 Python Traceback，因此不能据此确定唯一原因。
+
+已做的复现检查：
+
+- 直接启动节点：节点正常运行，并持续发布检测状态。
+- 使用完整 launch 启动：节点正常启动，重新运行时没有再次退出。
+- 离线检测：字典、角点输出和检测逻辑可以正常工作。
+- 源码与 ROS2 安装目录中的节点已核对一致。
+
+因此，当前证据不足以确认原进程是由代码逻辑直接导致退出；
+更可能的情况包括启动时使用了旧版已安装节点、环境变量或相机
+初始化状态异常、或 OpenCV 窗口创建异常。相机初始化日志中的
+`uvc_open failed` 同时说明另一侧相机节点曾无法打开设备，
+但已启动的 ArUco 节点本身没有从日志中看到检测或转换异常。
+
+为提高可复现性，节点现在会：
+
+- 跳过单帧图像转换异常，不让整个节点退出；
+- 跳过单帧 ArUco 检测异常，不让整个节点退出；
+- 将角点数组整理为固定的四行二列形式；
+- 提供 `aruco_show_windows` 参数，可关闭 OpenCV 窗口；
+- 保持检测异常时仍可继续等待下一帧。

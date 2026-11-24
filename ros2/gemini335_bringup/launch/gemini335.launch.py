@@ -65,6 +65,29 @@ def generate_launch_description():
                 "green_jar_image_topic",
                 default_value="/gemini335/color/image_raw",
             ),
+
+            # ArUco 节点开关及参数：
+            # - enable_aruco_detection：true 时启动检测节点，false 时不启动，
+            #   可避免在只需要相机或绿色颜色分割时额外占用计算资源；
+            # - aruco_image_topic：ArUco 节点订阅的彩色图像话题；
+            # - aruco_dictionary：必须与生成和打印标记时使用的字典一致；
+            # - aruco_results_dir：按 s/f 保存检测案例图的目标目录；
+            # - aruco_show_windows=false：关闭本地 OpenCV 窗口，适合远程或无桌面运行，
+            #   节点仍继续发布标注图像和 JSON 检测结果。
+            DeclareLaunchArgument("enable_aruco_detection", default_value="false"),
+            DeclareLaunchArgument(
+                "aruco_image_topic",
+                default_value="/gemini335/color/image_raw",
+            ),
+            DeclareLaunchArgument(
+                "aruco_dictionary",
+                default_value="DICT_4X4_50",
+            ),
+            DeclareLaunchArgument(
+                "aruco_results_dir",
+                default_value="/home/xiaokai/gemini335-learning/results/images/marker",
+            ),
+            DeclareLaunchArgument("aruco_show_windows", default_value="true"),
             Node(
                 package="orbbec_camera",
                 executable="orbbec_camera_node",
@@ -149,6 +172,24 @@ def generate_launch_description():
                         "clahe_clip": LaunchConfiguration("green_jar_clahe_clip"),
                         "results_dir": LaunchConfiguration("green_jar_results_dir"),
                         "show_windows": True,
+                    }
+                ],
+            ),
+            Node(
+                package="gemini335_bringup",
+                executable="object_detection_aruco.py",
+                name="aruco_detector",
+                output="screen",
+                # 只有明确启用时才启动 ArUco 节点，不影响相机和绿色分割节点。
+                condition=IfCondition(
+                    LaunchConfiguration("enable_aruco_detection")
+                ),
+                parameters=[
+                    {
+                        "image_topic": LaunchConfiguration("aruco_image_topic"),
+                        "dictionary_name": LaunchConfiguration("aruco_dictionary"),
+                        "results_dir": LaunchConfiguration("aruco_results_dir"),
+                        "show_windows": LaunchConfiguration("aruco_show_windows"),
                     }
                 ],
             ),

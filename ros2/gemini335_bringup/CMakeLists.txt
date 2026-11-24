@@ -9,7 +9,9 @@ install(
 )
 
 install(
-  PROGRAMS ../../python/object_detection_color.py
+  PROGRAMS
+    ../../python/object_detection_color.py
+    ../../python/object_detection_aruco.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
