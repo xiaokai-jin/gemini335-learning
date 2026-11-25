@@ -321,7 +321,7 @@ python3 python/object_detection_color.py
 
 ## 9. ArUco 标记检测
 
-当前 ArUco 实现只负责标记检测，不估计相机位姿。生成标记时使用：
+ArUco 节点会检测标记编号和角点，并利用 Gemini 335 发布的彩色相机内参估计标记相对于相机光学坐标系的位姿。生成标记时使用：
 
 ```text
 字典：DICT_4X4_50
@@ -338,15 +338,29 @@ source ros2/install/setup.bash
 
 ros2 launch gemini335_bringup gemini335.launch.py \
   enable_aruco_detection:=true \
-  aruco_dictionary:=DICT_4X4_50
+  aruco_dictionary:=DICT_4X4_50 \
+  aruco_marker_length_m:=0.0485
 ```
 
-节点会在彩色图像上绘制标记边框、编号和中心点，并发布：
+`aruco_marker_length_m` 必须填写标记黑色外框的实际边长，单位为米；此处使用实测的 `48.5 mm = 0.0485 m`。`aruco_camera_info_topic` 默认为 `/gemini335/color/camera_info`，必须对应正在检测的彩色图像及其分辨率。
+
+节点会在彩色图像上绘制标记边框、编号、中心点和 XYZ 坐标轴，并发布：
 
 ```text
 /gemini335/detection/aruco/image
 /gemini335/detection/aruco
 ```
+
+同时会通过 `/tf` 发布相机到标记的实时变换，子坐标系默认为：
+
+```text
+aruco_marker_0
+aruco_marker_1
+...
+```
+
+变换的父坐标系来自彩色图像的 `header.frame_id`，子坐标系原点位于
+ArUco 标记中心，平移和完整三维旋转均可在 TF 中查看。
 
 检测话题中的每个标记包含：
 
@@ -354,9 +368,19 @@ ros2 launch gemini335_bringup gemini335.launch.py \
 id：标记编号
 corners：四个角点像素坐标
 center：四角的中心像素坐标
+pose.translation_m：标记原点在相机光学坐标系中的 [X, Y, Z]，单位米
+pose.rotation_vector_rad：标记相对于相机的 Rodrigues 旋转向量，单位弧度
+pose.rotation_matrix：对应的 3×3 旋转矩阵
+pose.distance_m：相机光学中心到标记原点的直线距离，单位米
+pose.quaternion_xyzw：标记相对相机的姿态四元数，顺序为 x/y/z/w
+camera_info_valid：当前图像是否具有有效且匹配的相机内参
+pose_valid：当前帧是否成功估计了至少一个标记的位姿
 ```
 
-角点顺序为左上、右上、右下、左下。检测窗口按 `s` 保存成功案例，
+相机坐标遵循 ROS optical frame：X 向图像右方、Y 向图像下方、Z 向相机前方。角点顺序为左上、右上、右下、左下。
+`camera_info_valid` 表示相机内参是否可用于当前图像；`pose_valid` 表示当前帧是否成功估计了至少一个标记的位姿。CameraInfo 尚未到达、内参为零、畸变模型不支持或分辨率不匹配时，`camera_info_valid` 和 `pose_valid` 会是 `false`，检测结果仍包含编号和角点，但各标记的 `pose` 为 `null`，不会用不匹配的内参估算位姿。
+
+检测窗口按 `s` 保存成功案例，
 按 `f` 保存失败案例，按 `q` 退出。
 
 查看检测结果：
@@ -364,6 +388,48 @@ center：四角的中心像素坐标
 ```bash
 ros2 topic echo /gemini335/detection/aruco
 ```
+
+### 在 RViz2 查看相机与标记坐标系
+
+同时启动 ArUco 检测和 RViz2：
+
+```bash
+ros2 launch gemini335_bringup gemini335.launch.py \
+  enable_aruco_detection:=true \
+  enable_aruco_rviz:=true \
+  aruco_dictionary:=DICT_4X4_50 \
+  aruco_marker_length_m:=0.0485 \
+  aruco_pose_smoothing_alpha:=0.7
+```
+
+ArUco 角点会受像素量化、轻微模糊和反光影响，因此单帧 PnP 位姿可能跳动。
+节点对每个 ID 的平移使用指数移动平均，对旋转使用四元数球面插值（SLERP），
+TF 和 JSON 均发布平滑后的位姿。默认系数已调高至 `0.7`，以减少目标移动后的跟随延迟。
+`aruco_pose_smoothing_alpha` 范围为 `(0, 1]`：
+
+- `0.3`：更平滑，但目标移动时滞后较明显；
+- `0.7`：默认折中，跟随更及时；
+- `0.9`：响应很快，但残留抖动较多；
+- `1.0`：关闭平滑，使用每帧原始位姿。
+
+若标记连续丢失超过 `aruco_pose_filter_reset_sec`（默认 `0.5` 秒），下次检测会
+重新初始化滤波，避免旧位姿拖拽。滤波不能替代相机固定、清晰对焦、避免反光、
+标记贴平和准确填写标记边长；如需进一步减少抖动，应先确保标记在图像中足够大，
+并检查相机是否稳固及 `CameraInfo` 是否与输入图像匹配。
+
+RViz 配置会显示 TF 坐标轴、箭头和 frame 名称。默认固定坐标系为
+`gemini335_color_optical_frame`；若相机发布的图像 `header.frame_id`
+不同，在 RViz 左侧 `Global Options → Fixed Frame` 中改成实际 frame。
+
+可在另一个终端查看相机到目标的变换：
+
+```bash
+ros2 run tf2_ros tf2_echo gemini335_color_optical_frame aruco_marker_0
+```
+
+只有检测到有效标记且收到有效相机内参时，标记 TF 才会出现。目标移动或旋转时，
+标记坐标系也会随图像帧持续更新。若同一个 ID 的标记在画面中出现多次，它们会
+共享同一个 TF 子 frame；因此一个 ID 应只对应一个同时可见的实体标记。
 
 ## 10. ArUco 节点退出原因说明
 

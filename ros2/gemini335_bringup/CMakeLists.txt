@@ -9,6 +9,11 @@ install(
 )
 
 install(
+  DIRECTORY rviz
+  DESTINATION share/${PROJECT_NAME}
+)
+
+install(
   PROGRAMS
     ../../python/object_detection_color.py
     ../../python/object_detection_aruco.py

@@ -2,6 +2,8 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
+from launch.substitutions import PathJoinSubstitution
+from launch_ros.substitutions import FindPackageShare
 from launch_ros.actions import Node
 
 
@@ -80,14 +82,22 @@ def generate_launch_description():
                 default_value="/gemini335/color/image_raw",
             ),
             DeclareLaunchArgument(
+                "aruco_camera_info_topic",
+                default_value="/gemini335/color/camera_info",
+            ),
+            DeclareLaunchArgument(
                 "aruco_dictionary",
                 default_value="DICT_4X4_50",
             ),
+            DeclareLaunchArgument("aruco_marker_length_m", default_value="0.0485"),
+            DeclareLaunchArgument("aruco_pose_smoothing_alpha", default_value="0.7"),
+            DeclareLaunchArgument("aruco_pose_filter_reset_sec", default_value="0.5"),
             DeclareLaunchArgument(
                 "aruco_results_dir",
                 default_value="/home/xiaokai/gemini335-learning/results/images/marker",
             ),
             DeclareLaunchArgument("aruco_show_windows", default_value="true"),
+            DeclareLaunchArgument("enable_aruco_rviz", default_value="false"),
             Node(
                 package="orbbec_camera",
                 executable="orbbec_camera_node",
@@ -187,10 +197,41 @@ def generate_launch_description():
                 parameters=[
                     {
                         "image_topic": LaunchConfiguration("aruco_image_topic"),
+                        "camera_info_topic": LaunchConfiguration(
+                            "aruco_camera_info_topic"
+                        ),
                         "dictionary_name": LaunchConfiguration("aruco_dictionary"),
+                        "marker_length_m": LaunchConfiguration(
+                            "aruco_marker_length_m"
+                        ),
+                        "pose_smoothing_alpha": LaunchConfiguration(
+                            "aruco_pose_smoothing_alpha"
+                        ),
+                        "pose_filter_reset_sec": LaunchConfiguration(
+                            "aruco_pose_filter_reset_sec"
+                        ),
                         "results_dir": LaunchConfiguration("aruco_results_dir"),
                         "show_windows": LaunchConfiguration("aruco_show_windows"),
                     }
+                ],
+            ),
+            Node(
+                package="rviz2",
+                executable="rviz2",
+                name="aruco_rviz",
+                output="screen",
+                condition=IfCondition(
+                    LaunchConfiguration("enable_aruco_rviz")
+                ),
+                arguments=[
+                    "-d",
+                    PathJoinSubstitution(
+                        [
+                            FindPackageShare("gemini335_bringup"),
+                            "rviz",
+                            "aruco.rviz",
+                        ]
+                    ),
                 ],
             ),
         ]
