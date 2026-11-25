@@ -231,6 +231,7 @@ git push
 ```gitignore
 __pycache__/
 .venv/
+/cuda/
 .vscode/
 build/
 install/
@@ -245,7 +246,70 @@ log/
 *.key
 ```
 
-## 9. 第一个学习目标
+## 9. CUDA 与 PyTorch 环境
+
+项目使用独立的 `cuda/` Python 虚拟环境运行 CUDA 版 PyTorch，不会修改系统 Python。
+当前已验证的开发环境：
+
+```text
+GPU：NVIDIA GeForce RTX 3060 Laptop GPU（6 GB）
+NVIDIA 驱动：595.99.02
+PyTorch：2.14.1+cu132
+torchvision：0.29.2+cu132
+PyTorch CUDA Runtime：13.2
+```
+
+`nvidia-smi` 显示的 CUDA 版本是驱动支持的 CUDA Runtime 版本；运行 PyTorch/YOLO
+通常不需要另外安装系统级 CUDA Toolkit。当前虚拟环境的 PyTorch CUDA 运算已通过实测。
+
+### 激活环境
+
+在项目根目录运行：
+
+```bash
+source cuda/bin/activate
+```
+
+退出虚拟环境：
+
+```bash
+deactivate
+```
+
+### 验证 PyTorch 和 GPU
+
+```bash
+python - <<'PY'
+import torch
+import torchvision
+
+print("PyTorch:", torch.__version__)
+print("torchvision:", torchvision.__version__)
+print("PyTorch CUDA:", torch.version.cuda)
+print("CUDA available:", torch.cuda.is_available())
+if torch.cuda.is_available():
+    print("GPU:", torch.cuda.get_device_name(0))
+    x = torch.randn((1024, 1024), device="cuda")
+    y = x @ x
+    torch.cuda.synchronize()
+    print("CUDA test:", y.device, torch.isfinite(y).all().item())
+PY
+```
+
+创建新环境时，Ubuntu 需要先提供 `venv` 支持。若系统提示 `ensurepip is not available`，
+安装 `python3.10-venv` 后再创建：
+
+```bash
+sudo apt install python3.10-venv
+python3 -m venv cuda
+cuda/bin/python -m pip install --upgrade pip
+cuda/bin/python -m pip install torch torchvision \
+  --index-url https://download.pytorch.org/whl/cu132
+```
+
+`cuda/` 是本机虚拟环境目录，已加入 `.gitignore`，不要提交到 Git。
+
+## 10. 第一个学习目标
 
 创建 GitHub 仓库，安装 Gemini 335 SDK，成功显示 RGB 图像和深度图，并完成第一篇实验记录。
 
