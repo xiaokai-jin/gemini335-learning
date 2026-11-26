@@ -305,9 +305,33 @@ python3 -m venv cuda
 cuda/bin/python -m pip install --upgrade pip
 cuda/bin/python -m pip install torch torchvision \
   --index-url https://download.pytorch.org/whl/cu132
+cuda/bin/python -m pip install "ultralytics==8.4.219" "numpy==1.26.4"
+cuda/bin/python -m pip install \
+  "git+https://github.com/ultralytics/CLIP.git"
 ```
 
 `cuda/` 是本机虚拟环境目录，已加入 `.gitignore`，不要提交到 Git。
+YOLOE 文本提示依赖 CLIP；安装 CLIP 时也会安装 `ftfy`、`regex` 等文本处理依赖。
+
+### 运行 YOLOE 相机检测
+
+YOLOE 预训练权重位于 `models/yoloe-26s-seg.pt`。启动 ROS2 检测前，先加载 ROS
+和相机工作区，再激活 CUDA 虚拟环境，以确保节点使用 CUDA 版 PyTorch：
+
+```bash
+source /opt/ros/humble/setup.bash
+source /home/xiaokai/orbbec_ws/install/setup.bash
+source ros2/install/setup.bash
+source cuda/bin/activate
+
+ros2 launch gemini335_bringup gemini335.launch.py \
+  enable_yolo_detection:=true \
+  yolo_classes:="a green jar,a bottle,a cup"
+```
+
+完整参数、结果话题和调节方法见 [YOLO 目标检测文档](docs/08-目标检测.md#7-实现方式四-yolo-目标检测)。
+模型权重为本机文件，不会提交到 Git；如果模型是在上次构建后才下载的，请重新构建
+`gemini335_bringup`，使权重安装到 ROS 包的 share 目录。
 
 ## 10. 第一个学习目标
 

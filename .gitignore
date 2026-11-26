@@ -1,6 +1,8 @@
 __pycache__/
 .venv/
 /cuda/
+/models/*.pt
+/weights/
 build/
 install/
 log/

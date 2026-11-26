@@ -5,6 +5,7 @@ from launch.substitutions import LaunchConfiguration
 from launch.substitutions import PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description():
@@ -66,6 +67,42 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 "green_jar_image_topic",
                 default_value="/gemini335/color/image_raw",
+            ),
+
+            # Optional YOLOE detector. The model is installed into the package
+            # share directory when the local weights file is present at build time.
+            DeclareLaunchArgument("enable_yolo_detection", default_value="false"),
+            DeclareLaunchArgument(
+                "yolo_image_topic",
+                default_value="/gemini335/color/image_raw",
+            ),
+            DeclareLaunchArgument(
+                "yolo_model",
+                default_value=PathJoinSubstitution(
+                    [
+                        FindPackageShare("gemini335_bringup"),
+                        "models",
+                        "yoloe-26s-seg.pt",
+                    ]
+                ),
+            ),
+            DeclareLaunchArgument(
+                "yolo_classes",
+                default_value=(
+                    "a green jar,a green tissue package,a bottle,a cup,a person"
+                ),
+            ),
+            DeclareLaunchArgument("yolo_image_size", default_value="640"),
+            DeclareLaunchArgument("yolo_confidence_threshold", default_value="0.25"),
+            DeclareLaunchArgument("yolo_iou_threshold", default_value="0.45"),
+            DeclareLaunchArgument("yolo_max_detections", default_value="50"),
+            DeclareLaunchArgument("yolo_max_inference_rate", default_value="20.0"),
+            DeclareLaunchArgument("yolo_device", default_value="0"),
+            DeclareLaunchArgument("yolo_half_precision", default_value="true"),
+            DeclareLaunchArgument("yolo_show_window", default_value="true"),
+            DeclareLaunchArgument(
+                "yolo_results_dir",
+                default_value="/home/xiaokai/gemini335-learning/results/images/yolo",
             ),
 
             # ArUco 节点开关及参数：
@@ -212,6 +249,41 @@ def generate_launch_description():
                         ),
                         "results_dir": LaunchConfiguration("aruco_results_dir"),
                         "show_windows": LaunchConfiguration("aruco_show_windows"),
+                    }
+                ],
+            ),
+            Node(
+                package="gemini335_bringup",
+                executable="object_detection_yolo.py",
+                name="yolo_detector",
+                output="screen",
+                condition=IfCondition(
+                    LaunchConfiguration("enable_yolo_detection")
+                ),
+                parameters=[
+                    {
+                        "image_topic": LaunchConfiguration("yolo_image_topic"),
+                        "model": LaunchConfiguration("yolo_model"),
+                        "classes": LaunchConfiguration("yolo_classes"),
+                        "image_size": LaunchConfiguration("yolo_image_size"),
+                        "confidence_threshold": LaunchConfiguration(
+                            "yolo_confidence_threshold"
+                        ),
+                        "iou_threshold": LaunchConfiguration("yolo_iou_threshold"),
+                        "max_detections": LaunchConfiguration(
+                            "yolo_max_detections"
+                        ),
+                        "max_inference_rate": LaunchConfiguration(
+                            "yolo_max_inference_rate"
+                        ),
+                        "device": ParameterValue(
+                            LaunchConfiguration("yolo_device"), value_type=str
+                        ),
+                        "half_precision": LaunchConfiguration(
+                            "yolo_half_precision"
+                        ),
+                        "show_window": LaunchConfiguration("yolo_show_window"),
+                        "results_dir": LaunchConfiguration("yolo_results_dir"),
                     }
                 ],
             ),
